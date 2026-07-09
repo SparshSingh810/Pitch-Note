@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ match.home_team.name }} vs {{ match.away_team.name }} — PitchNote{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="match-header">
+    <a class="match-team" href="{{ url_for('team_page', team_id=match.home_team.id) }}">
+      <div class="crest-xl" style="background:{{ match.home_team.primary_color }};">{{ match.home_team.crest_initials }}</div>
+      <div>{{ match.home_team.name }}</div>
+      <div class="sub" style="color:var(--text-faint); font-size:12px;">{{ match.home_formation }}</div>
+    </a>
+    <div>
+      <div class="match-score">{{ match.home_score }} – {{ match.away_score }}</div>
+      <div class="match-status">{{ match.status }} · Matchday {{ match.matchday }}</div>
+    </div>
+    <a class="match-team" href="{{ url_for('team_page', team_id=match.away_team.id) }}">
+      <div class="crest-xl" style="background:{{ match.away_team.primary_color }};">{{ match.away_team.crest_initials }}</div>
+      <div>{{ match.away_team.name }}</div>
+      <div class="sub" style="color:var(--text-faint); font-size:12px;">{{ match.away_formation }}</div>
+    </a>
+  </div>
+
+  <div class="section-head"><h2>Top performers</h2></div>
+  <div class="top-performers" style="margin-bottom:30px;">
+    {% for e in top_performers %}
+    <div class="performer-card">
+      {{ m.rating_ring(e.rating) }}
+      <a href="{{ url_for('player_page', player_id=e.player.id) }}" style="font-weight:600; font-size:13.5px;">{{ e.player.name }}</a>
+      <div class="sub" style="color:var(--text-faint); font-size:12px;">{{ e.team.short_name }} · {{ e.position_label }}</div>
+      {% if e.goals or e.assists %}
+      <div class="sub" style="font-size:12px;">{{ e.goals }}⚽ {{ e.assists }}🅰️</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="section-head"><h2>Lineups</h2></div>
+  <div class="pitch-wrap">
+    <div class="pitch">
+      <div class="pitch-dot"></div>
+      {% for e in home_lineup %}
+      <div class="player-dot" style="left:{{ e.pos_x }}%; top:{{ e.pos_y }}%;">
+        <div class="num">{{ e.player.shirt_number }}</div>
+        <div class="pname">{{ e.player.name.split(' ')[-1] }}</div>
+        {{ m.rating_ring(e.rating, 'sm') }}
+      </div>
+      {% endfor %}
+      {% for e in away_lineup %}
+      <div class="player-dot" style="left:{{ e.pos_x }}%; top:{{ e.pos_y }}%;">
+        <div class="num">{{ e.player.shirt_number }}</div>
+        <div class="pname">{{ e.player.name.split(' ')[-1] }}</div>
+        {{ m.rating_ring(e.rating, 'sm') }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card subs-list">
+      <div style="font-weight:600; margin-bottom:8px; font-size:13px; color:var(--text-dim);">{{ match.home_team.short_name }} — Substitutes</div>
+      {% for e in home_subs %}
+      <a class="leader-row" href="{{ url_for('player_page', player_id=e.player.id) }}">
+        <span class="pos-tag">{{ e.position_label }}</span>
+        <span class="name">{{ e.player.name }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="card subs-list">
+      <div style="font-weight:600; margin-bottom:8px; font-size:13px; color:var(--text-dim);">{{ match.away_team.short_name }} — Substitutes</div>
+      {% for e in away_subs %}
+      <a class="leader-row" href="{{ url_for('player_page', player_id=e.player.id) }}">
+        <span class="pos-tag">{{ e.position_label }}</span>
+        <span class="name">{{ e.player.name }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

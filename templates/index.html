@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}PitchNote — Live Scores, Standings & Player Ratings{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <section class="hero">
+    <div class="hero-eyebrow"><span class="pulse"></span> 10 leagues · updated locally</div>
+    <h1>Every table, every rating,<br>one page.</h1>
+    <p class="lead">Standings, squads, and match-by-match player ratings across the Premier League, La Liga,
+      Serie A, and seven more top-flight leagues — no ads, no clutter.</p>
+
+    {% if recent_matches %}
+    <div class="ticker">
+      {% for match in recent_matches %}
+      <a class="ticker-card" href="{{ url_for('match_page', match_id=match.id) }}">
+        <div class="ticker-league">
+          <span>{{ match.league.code }}</span>
+          <span>MD {{ match.matchday }}</span>
+        </div>
+        <div class="ticker-row">
+          <span class="name">{{ match.home_team.short_name }}</span>
+          <span class="score">{{ match.home_score }}</span>
+        </div>
+        <div class="ticker-row">
+          <span class="name">{{ match.away_team.short_name }}</span>
+          <span class="score">{{ match.away_score }}</span>
+        </div>
+        <div class="ft-tag">FULL TIME</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="section grid-2">
+    <div>
+      <div class="section-head">
+        <h2>{{ featured.name if featured else 'Standings' }}</h2>
+        {% if featured %}<a class="more" href="{{ url_for('league_page', code=featured.code) }}">Full table →</a>{% endif %}
+      </div>
+      <div class="card">
+        <table class="standings">
+          <thead><tr>
+            <th class="num">#</th><th>Club</th><th class="num">P</th><th class="num">W</th>
+            <th class="num">D</th><th class="num">L</th><th class="num">GD</th><th class="num">Pts</th>
+          </tr></thead>
+          <tbody>
+          {% for s in standings_preview %}
+            <tr>
+              <td class="num">{{ s.position }}</td>
+              <td><a class="team-cell" href="{{ url_for('team_page', team_id=s.team.id) }}">{{ m.crest(s.team) }} {{ s.team.name }}</a></td>
+              <td class="num">{{ s.played }}</td>
+              <td class="num">{{ s.won }}</td>
+              <td class="num">{{ s.drawn }}</td>
+              <td class="num">{{ s.lost }}</td>
+              <td class="num">{{ s.goal_diff }}</td>
+              <td class="num"><strong>{{ s.points }}</strong></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-head"><h2>Top rated</h2></div>
+      <div class="card" style="margin-bottom:20px;">
+        {% for p in top_rated %}
+        <a class="leader-row" href="{{ url_for('player_page', player_id=p.id) }}">
+          <span class="rank">{{ loop.index }}</span>
+          {{ m.rating_ring(p.avg_rating, 'sm') }}
+          <span class="name">{{ p.name }} <span class="sub">· {{ p.team.short_name }}</span></span>
+        </a>
+        {% endfor %}
+      </div>
+
+      <div class="section-head"><h2>Top scorers</h2></div>
+      <div class="card">
+        {% for p in top_scorers %}
+        <a class="leader-row" href="{{ url_for('player_page', player_id=p.id) }}">
+          <span class="rank">{{ loop.index }}</span>
+          <span class="name">{{ p.name }} <span class="sub">· {{ p.team.short_name }}</span></span>
+          <span class="stat">{{ p.goals }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>All leagues</h2></div>
+    <div class="league-tiles">
+      {% for l in leagues %}
+      <a class="card league-tile" href="{{ url_for('league_page', code=l.code) }}">
+        <div class="league-tile-icon">{{ l.logo }}</div>
+        <div class="league-tile-name">{{ l.name }}</div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

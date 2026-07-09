@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ league.name }} — Standings & Stats — PitchNote{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="league-header">
+    <div class="league-badge">{{ league.logo }}</div>
+    <div>
+      <h1 style="font-size:26px;">{{ league.name }}</h1>
+      <div class="meta">{{ league.country }} · {{ league.season }} · {{ standings|length }} clubs</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <a class="tab {% if tab=='table' %}active{% endif %}" href="{{ url_for('league_page', code=league.code, tab='table') }}">Table</a>
+    <a class="tab {% if tab=='stats' %}active{% endif %}" href="{{ url_for('league_page', code=league.code, tab='stats') }}">Stats</a>
+    <a class="tab {% if tab=='matches' %}active{% endif %}" href="{{ url_for('league_page', code=league.code, tab='matches') }}">Results</a>
+  </div>
+
+  {% if tab == 'table' %}
+  <div class="card">
+    <table class="standings">
+      <thead><tr>
+        <th class="num">#</th><th>Club</th><th class="num">P</th><th class="num">W</th>
+        <th class="num">D</th><th class="num">L</th><th class="num">GF</th><th class="num">GA</th>
+        <th class="num">GD</th><th class="num">Pts</th><th>Form</th>
+      </tr></thead>
+      <tbody>
+      {% for s in standings %}
+        <tr class="{% if s.position <= 4 %}zone-cl{% elif s.position > standings|length - 3 %}zone-rel{% endif %}">
+          <td class="pos num">{{ s.position }}</td>
+          <td><a class="team-cell" href="{{ url_for('team_page', team_id=s.team.id) }}">{{ m.crest(s.team) }} {{ s.team.name }}</a></td>
+          <td class="num">{{ s.played }}</td>
+          <td class="num">{{ s.won }}</td>
+          <td class="num">{{ s.drawn }}</td>
+          <td class="num">{{ s.lost }}</td>
+          <td class="num">{{ s.goals_for }}</td>
+          <td class="num">{{ s.goals_against }}</td>
+          <td class="num">{{ s.goal_diff }}</td>
+          <td class="num"><strong>{{ s.points }}</strong></td>
+          <td>{{ m.form_chips(s.form) }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p style="color:var(--text-faint); font-size:12px; margin-top:10px;">
+    Green rail = continental qualification zone · Red rail = relegation zone (illustrative cut-offs).
+  </p>
+
+  {% elif tab == 'stats' %}
+  <div class="grid-2" style="grid-template-columns:1fr 1fr 1fr; gap:16px;">
+    <div>
+      <div class="section-head"><h2 style="font-size:16px;">Top scorers</h2></div>
+      <div class="card">
+        {% for p in top_scorers %}
+        <a class="leader-row" href="{{ url_for('player_page', player_id=p.id) }}">
+          <span class="rank">{{ loop.index }}</span>
+          <span class="name">{{ p.name }} <span class="sub">· {{ p.team.short_name }}</span></span>
+          <span class="stat">{{ p.goals }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <div class="section-head"><h2 style="font-size:16px;">Top assists</h2></div>
+      <div class="card">
+        {% for p in top_assists %}
+        <a class="leader-row" href="{{ url_for('player_page', player_id=p.id) }}">
+          <span class="rank">{{ loop.index }}</span>
+          <span class="name">{{ p.name }} <span class="sub">· {{ p.team.short_name }}</span></span>
+          <span class="stat">{{ p.assists }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <div class="section-head"><h2 style="font-size:16px;">Highest rated</h2></div>
+      <div class="card">
+        {% for p in top_rated %}
+        <a class="leader-row" href="{{ url_for('player_page', player_id=p.id) }}">
+          <span class="rank">{{ loop.index }}</span>
+          {{ m.rating_ring(p.avg_rating, 'sm') }}
+          <span class="name">{{ p.name }} <span class="sub">· {{ p.team.short_name }}</span></span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% elif tab == 'matches' %}
+  <div class="card">
+    {% for match in matches %}
+    <a class="leader-row" href="{{ url_for('match_page', match_id=match.id) }}" style="justify-content:space-between;">
+      <span class="sub" style="width:60px;">MD {{ match.matchday }}</span>
+      <span class="name" style="text-align:right;">{{ match.home_team.name }}</span>
+      <span class="stat" style="width:70px; text-align:center;">{{ match.home_score }} – {{ match.away_score }}</span>
+      <span class="name">{{ match.away_team.name }}</span>
+    </a>
+    {% else %}
+    <div class="empty-state">No results yet this season.</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

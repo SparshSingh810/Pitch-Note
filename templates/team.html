@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ team.name }} — Squad & Stats — PitchNote{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="team-hero">
+    <div class="team-crest-lg" style="background:{{ team.primary_color }};">{{ team.crest_initials }}</div>
+    <div>
+      <h1 style="font-size:28px;">{{ team.name }}</h1>
+      <div class="meta" style="color:var(--text-faint); font-size:13px;">
+        {{ team.league.name }} · Founded {{ team.founded }} · {{ team.venue }}
+      </div>
+    </div>
+  </div>
+
+  {% if standing %}
+  <div class="stat-strip">
+    <div class="stat-pill"><div class="v">#{{ standing.position }}</div><div class="k">Position</div></div>
+    <div class="stat-pill"><div class="v">{{ standing.points }}</div><div class="k">Points</div></div>
+    <div class="stat-pill"><div class="v">{{ standing.won }}-{{ standing.drawn }}-{{ standing.lost }}</div><div class="k">W-D-L</div></div>
+    <div class="stat-pill"><div class="v">{{ standing.goals_for }}</div><div class="k">Goals for</div></div>
+    <div class="stat-pill"><div class="v">{{ standing.goal_diff }}</div><div class="k">Goal diff</div></div>
+    <div class="stat-pill"><div class="v">{{ m.form_chips(standing.form) }}</div><div class="k">Form</div></div>
+  </div>
+  {% endif %}
+
+  <div class="grid-2">
+    <div>
+      <div class="section-head"><h2>Squad</h2></div>
+      <div class="card">
+        <table class="squad">
+          <thead><tr>
+            <th class="num">#</th><th>Player</th><th>Pos</th><th>Nat</th><th class="num">Age</th>
+            <th class="num">Apps</th><th class="num">G</th><th class="num">A</th><th class="num">Rating</th>
+          </tr></thead>
+          <tbody>
+          {% for p in squad %}
+            <tr>
+              <td class="num">{{ p.shirt_number }}</td>
+              <td><a href="{{ url_for('player_page', player_id=p.id) }}">{{ p.name }}</a></td>
+              <td><span class="pos-tag">{{ p.position }}</span></td>
+              <td style="color:var(--text-dim);">{{ p.nationality }}</td>
+              <td class="num">{{ p.age }}</td>
+              <td class="num">{{ p.appearances }}</td>
+              <td class="num">{{ p.goals }}</td>
+              <td class="num">{{ p.assists }}</td>
+              <td class="num">{{ m.rating_ring(p.avg_rating, 'sm') }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-head"><h2>Recent matches</h2></div>
+      <div class="card">
+        {% for match in recent %}
+        <a class="leader-row" href="{{ url_for('match_page', match_id=match.id) }}">
+          <span class="name">
+            {{ match.home_team.short_name }} {{ match.home_score }} – {{ match.away_score }} {{ match.away_team.short_name }}
+          </span>
+          <span class="sub">MD {{ match.matchday }}</span>
+        </a>
+        {% else %}
+        <div class="empty-state">No matches recorded yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

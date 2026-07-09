@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}{{ player.name }} — Player Profile — PitchNote{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="player-hero">
+    <div class="player-avatar">{{ player.name.split(' ')|map('first')|join('') }}</div>
+    <div>
+      <h1 style="font-size:28px;">{{ player.name }}</h1>
+      <div style="color:var(--text-faint); font-size:13px; margin-top:4px;">
+        <a href="{{ url_for('team_page', team_id=player.team.id) }}" style="color:var(--accent-strong);">{{ player.team.name }}</a>
+        · {{ player.position }} · #{{ player.shirt_number }} · {{ player.nationality }} · Age {{ player.age }}
+      </div>
+    </div>
+    <div style="margin-left:auto;">{{ m.rating_ring(player.avg_rating) }}</div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat-pill"><div class="v">{{ player.appearances }}</div><div class="k">Appearances</div></div>
+    <div class="stat-pill"><div class="v">{{ player.goals }}</div><div class="k">Goals</div></div>
+    <div class="stat-pill"><div class="v">{{ player.assists }}</div><div class="k">Assists</div></div>
+    <div class="stat-pill"><div class="v">{{ player.minutes }}</div><div class="k">Minutes</div></div>
+    <div class="stat-pill"><div class="v">{{ player.yellow_cards }}</div><div class="k">Yellow cards</div></div>
+    <div class="stat-pill"><div class="v">{{ player.red_cards }}</div><div class="k">Red cards</div></div>
+    <div class="stat-pill"><div class="v">€{{ '%.1f'|format(player.market_value_eur / 1000000) }}m</div><div class="k">Market value</div></div>
+  </div>
+
+  <div class="section-head"><h2>Recent match ratings</h2></div>
+  <div class="card">
+    {% for e in entries %}
+    <a class="leader-row" href="{{ url_for('match_page', match_id=e.match_id) }}">
+      <span class="name">
+        {{ e.match.home_team.short_name }} {{ e.match.home_score }}-{{ e.match.away_score }} {{ e.match.away_team.short_name }}
+        {% if not e.is_starting %}<span class="sub">(sub)</span>{% endif %}
+      </span>
+      <span class="sub">{{ e.goals }}⚽ {{ e.assists }}🅰️</span>
+      {{ m.rating_ring(e.rating, 'sm') }}
+    </a>
+    {% else %}
+    <div class="empty-state">No match ratings recorded yet for this player.</div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

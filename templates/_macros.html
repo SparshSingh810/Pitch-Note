@@ -1,0 +1,16 @@
+{% macro crest(team, size=26) -%}
+<span class="crest" style="width:{{ size }}px;height:{{ size }}px;background:{{ team.primary_color }};font-size:{{ (size*0.4)|round|int }}px;">{{ team.crest_initials }}</span>
+{%- endmacro %}
+
+{% macro rating_ring(value, size='') -%}
+{% set tier = 'poor' %}
+{% if value >= 7.5 %}{% set tier = 'elite' %}
+{% elif value >= 6.8 %}{% set tier = 'good' %}
+{% elif value >= 6.0 %}{% set tier = 'average' %}
+{% endif %}
+<span class="rating-ring {{ tier }} {{ size }}">{{ '%.1f'|format(value) }}</span>
+{%- endmacro %}
+
+{% macro form_chips(form) -%}
+{% for c in form %}<span class="form-chip {{ c }}">{{ c }}</span>{% endfor %}
+{%- endmacro %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% block title %}Search “{{ q }}” — PitchNote{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="section-head" style="padding-top:30px;"><h2>Results for “{{ q }}”</h2></div>
+
+  <div class="grid-2">
+    <div>
+      <div class="section-head"><h2 style="font-size:16px;">Teams</h2></div>
+      <div class="card">
+        {% for t in teams %}
+        <a class="leader-row" href="{{ url_for('team_page', team_id=t.id) }}">
+          {{ m.crest(t) }}
+          <span class="name">{{ t.name }} <span class="sub">· {{ t.league.name }}</span></span>
+        </a>
+        {% else %}
+        <div class="empty-state">No teams matched.</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <div class="section-head"><h2 style="font-size:16px;">Players</h2></div>
+      <div class="card">
+        {% for p in players %}
+        <a class="leader-row" href="{{ url_for('player_page', player_id=p.id) }}">
+          {{ m.rating_ring(p.avg_rating, 'sm') }}
+          <span class="name">{{ p.name }} <span class="sub">· {{ p.team.name }}</span></span>
+        </a>
+        {% else %}
+        <div class="empty-state">No players matched.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
